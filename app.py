@@ -144,119 +144,110 @@ def get_account_info():
 
     try:
         # Get raw data from API
-        return_data = asyncio.run(GetAccountInformation(uid, "7", region, "/GetPlayerPersonalShow"))
+        raw_data = asyncio.run(GetAccountInformation(uid, "7", region, "/GetPlayerPersonalShow"))
         
-        # Extract sections
-        basic = return_data.get("basicInfo", {})
-        profile = return_data.get("profileInfo", {})
-        clan = return_data.get("clanBasicInfo", {})
-        captain = return_data.get("captainBasicInfo", {})
-        pet = return_data.get("petInfo", {})
-        social = return_data.get("socialInfo", {})
-        credit = return_data.get("creditScoreInfo", {})
-
-        # Prepare weapon and outfit data
-        weapon_ids = basic.get("weaponSkinShows", [])
-        weapon_images = [f"https://ff-community-api.vercel.app/icons?id={wid}" for wid in weapon_ids]
-        
-        outfit_ids = profile.get("clothes", [])
-        outfit_images = [f"https://ff-community-api.vercel.app/icons?id={oid}" for oid in outfit_ids]
-        
-        # Prepare skills data (using static images as in your example)
-        skill_ids = profile.get("equipedSkills", [])
-        skill_images = [
-            "https://i.postimg.cc/BnpRPsjv/Kelly-The-Swift.png",
-            "https://freefiremobile-a.akamaihd.net/common/web_event/official2.ff.garena.all/img/20228/e21eb41a3705ff817156dd5758157274.png",
-            "https://i.postimg.cc/FznQS4Wc/Moco-Rebirth.png",
-            "https://dl.dir.freefiremobile.com/common/web_event/official2.ff.garena.all/202412/b2f635a96ed787a8e540031402ea751b.png"
-        ]
-
-        # Build the response with exact field names
+        # Transform the response to match your exact format
         response = {
             "AccountInfo": {
-                "AccountBPBadges": basic.get("badgeCnt"),
-                "AccountBPID": basic.get("badgeId"),
-                "AccountCreateTime": basic.get("createAt"),
-                "AccountEXP": basic.get("exp"),
-                "AccountLastLogin": basic.get("lastLoginAt"),
-                "AccountLevel": basic.get("level"),
-                "AccountLikes": basic.get("liked"),
-                "AccountName": basic.get("nickname"),
-                "AccountRegion": basic.get("region"),
-                "AccountSeasonId": basic.get("seasonId"),
-                "AccountType": basic.get("accountType"),
-                "BrMaxRank": basic.get("maxRank"),
-                "BrRankPoint": basic.get("rankingPoints"),
-                "CsMaxRank": basic.get("csMaxRank"),
-                "CsRankPoint": basic.get("csRankingPoints"),
-                "EquippedWeapon": weapon_ids,
-                "EquippedWeaponImages": weapon_images,
-                "ReleaseVersion": basic.get("releaseVersion"),
-                "ShowBrRank": basic.get("showBrRank"),
-                "ShowCsRank": basic.get("showCsRank"),
-                "Title": basic.get("title"),
-                "hasElitePass": basic.get("hasElitePass")
+                "AccountBPBadges": raw_data["basicInfo"]["badgeCnt"],
+                "AccountBPID": raw_data["basicInfo"]["badgeId"],
+                "AccountCreateTime": raw_data["basicInfo"]["createAt"],
+                "AccountEXP": raw_data["basicInfo"]["exp"],
+                "AccountLastLogin": raw_data["basicInfo"]["lastLoginAt"],
+                "AccountLevel": raw_data["basicInfo"]["level"],
+                "AccountLikes": raw_data["basicInfo"]["liked"],
+                "AccountName": raw_data["basicInfo"]["nickname"],
+                "AccountRegion": region.upper(),
+                "AccountSeasonId": raw_data["basicInfo"]["seasonId"],
+                "AccountType": raw_data["basicInfo"]["accountType"],
+                "BrMaxRank": raw_data["basicInfo"]["maxRank"],
+                "BrRankPoint": raw_data["basicInfo"]["rankingPoints"],
+                "CsMaxRank": raw_data["basicInfo"]["csMaxRank"],
+                "CsRankPoint": raw_data["basicInfo"]["csRankingPoints"],
+                "EquippedWeapon": raw_data["basicInfo"]["weaponSkinShows"],
+                "EquippedWeaponImages": [
+                    f"https://ff-community-api.vercel.app/icons?id={weapon_id}" 
+                    for weapon_id in raw_data["basicInfo"]["weaponSkinShows"]
+                ],
+                "ReleaseVersion": raw_data["basicInfo"]["releaseVersion"],
+                "ShowBrRank": raw_data["basicInfo"]["showBrRank"],
+                "ShowCsRank": raw_data["basicInfo"]["showCsRank"],
+                "Title": raw_data["basicInfo"]["title"],
+                "hasElitePass": raw_data["basicInfo"]["hasElitePass"]
             },
             "AccountProfileInfo": {
-                "EquippedOutfit": outfit_ids,
-                "EquippedOutfitImages": outfit_images,
-                "EquippedSkills": skill_ids,
-                "EquippedSkillsImages": skill_images
+                "EquippedOutfit": raw_data["profileInfo"]["clothes"],
+                "EquippedOutfitImages": [
+                    f"https://ff-community-api.vercel.app/icons?id={outfit_id}"
+                    for outfit_id in raw_data["profileInfo"]["clothes"]
+                ],
+                "EquippedSkills": raw_data["profileInfo"]["equipedSkills"],
+                "EquippedSkillsImages": [
+                    "https://i.postimg.cc/BnpRPsjv/Kelly-The-Swift.png",
+                    "https://freefiremobile-a.akamaihd.net/common/web_event/official2.ff.garena.all/img/20228/e21eb41a3705ff817156dd5758157274.png",
+                    "https://i.postimg.cc/FznQS4Wc/Moco-Rebirth.png",
+                    "https://dl.dir.freefiremobile.com/common/web_event/official2.ff.garena.all/202412/b2f635a96ed787a8e540031402ea751b.png"
+                ]
             },
             "GuildInfo": {
-                "GuildCapacity": clan.get("capacity"),
-                "GuildID": clan.get("clanId"),
-                "GuildLevel": clan.get("clanLevel"),
-                "GuildMember": clan.get("memberNum"),
-                "GuildName": clan.get("clanName"),
-                "GuildOwner": clan.get("captainId")
+                "GuildCapacity": raw_data["clanBasicInfo"]["capacity"],
+                "GuildID": raw_data["clanBasicInfo"]["clanId"],
+                "GuildLevel": raw_data["clanBasicInfo"]["clanLevel"],
+                "GuildMember": raw_data["clanBasicInfo"]["memberNum"],
+                "GuildName": raw_data["clanBasicInfo"]["clanName"],
+                "GuildOwner": raw_data["clanBasicInfo"]["captainId"]
             },
             "captainBasicInfo": {
-                "EquippedWeapon": captain.get("weaponSkinShows", []),
-                "accountId": captain.get("accountId"),
-                "accountType": captain.get("accountType"),
-                "badgeCnt": captain.get("badgeCnt"),
-                "badgeId": str(captain.get("badgeId")),
-                "createAt": str(captain.get("createAt")),
-                "csMaxRank": captain.get("csMaxRank"),
-                "csRank": captain.get("csRank"),
-                "csRankingPoints": captain.get("csRankingPoints"),
-                "exp": captain.get("exp"),
-                "lastLoginAt": str(captain.get("lastLoginAt")),
-                "level": captain.get("level"),
-                "liked": captain.get("liked"),
-                "maxRank": captain.get("maxRank"),
-                "nickname": captain.get("nickname"),
-                "rank": captain.get("rank"),
-                "rankingPoints": captain.get("rankingPoints"),
-                "region": captain.get("region"),
-                "releaseVersion": captain.get("releaseVersion"),
-                "seasonId": captain.get("seasonId"),
-                "showBrRank": captain.get("showBrRank"),
-                "showCsRank": captain.get("showCsRank"),
-                "title": captain.get("title")
+                "EquippedWeapon": raw_data["basicInfo"]["weaponSkinShows"],
+                "accountId": uid,
+                "accountType": raw_data["basicInfo"]["accountType"],
+                "badgeCnt": raw_data["basicInfo"]["badgeCnt"],
+                "badgeId": str(raw_data["basicInfo"]["badgeId"]),
+                "createAt": str(raw_data["basicInfo"]["createAt"]),
+                "csMaxRank": raw_data["basicInfo"]["csMaxRank"],
+                "csRank": raw_data["basicInfo"]["csRank"],
+                "csRankingPoints": raw_data["basicInfo"]["csRankingPoints"],
+                "exp": raw_data["basicInfo"]["exp"],
+                "lastLoginAt": str(raw_data["basicInfo"]["lastLoginAt"]),
+                "level": raw_data["basicInfo"]["level"],
+                "liked": raw_data["basicInfo"]["liked"],
+                "maxRank": raw_data["basicInfo"]["maxRank"],
+                "nickname": raw_data["basicInfo"]["nickname"],
+                "rank": raw_data["basicInfo"]["rank"],
+                "rankingPoints": raw_data["basicInfo"]["rankingPoints"],
+                "region": region.upper(),
+                "releaseVersion": raw_data["basicInfo"]["releaseVersion"],
+                "seasonId": raw_data["basicInfo"]["seasonId"],
+                "showBrRank": raw_data["basicInfo"]["showBrRank"],
+                "showCsRank": raw_data["basicInfo"]["showCsRank"],
+                "title": raw_data["basicInfo"]["title"]
             },
             "creditScoreInfo": {
-                "creditScore": credit.get("creditScore"),
-                "periodicSummaryEndTime": str(credit.get("periodicSummaryEndTime")),
+                "creditScore": raw_data["creditScoreInfo"]["creditScore"],
+                "periodicSummaryEndTime": str(raw_data["creditScoreInfo"]["periodicSummaryEndTime"]),
                 "rewardState": 1
             },
             "petInfo": {
-                "exp": pet.get("exp"),
-                "id": pet.get("id"),
-                "isSelected": pet.get("isSelected"),
-                "level": pet.get("level"),
-                "selectedSkillId": pet.get("selectedSkillId"),
-                "skinId": pet.get("skinId")
+                "exp": raw_data["petInfo"]["exp"],
+                "id": raw_data["petInfo"]["id"],
+                "isSelected": raw_data["petInfo"]["isSelected"],
+                "level": raw_data["petInfo"]["level"],
+                "selectedSkillId": raw_data["petInfo"]["selectedSkillId"],
+                "skinId": raw_data["petInfo"]["skinId"]
             },
             "socialinfo": {
-                "AccountLanguage": social.get("language"),
-                "AccountSignature": social.get("signature")
+                "AccountLanguage": raw_data["socialInfo"]["language"],
+                "AccountSignature": raw_data["socialInfo"]["signature"]
             }
         }
+        
+        return jsonify(response)
 
-        return jsonify(response), 200, {'Content-Type': 'application/json; charset=utf-8'}
-
+    except KeyError as e:
+        return jsonify({
+            "error": f"Required field missing in API response: {str(e)}",
+            "details": "The Free Fire API response is missing expected fields"
+        }), 500
     except Exception as e:
         return jsonify({
             "error": "Failed to fetch player information",
