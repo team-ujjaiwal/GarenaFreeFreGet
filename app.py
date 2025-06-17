@@ -146,14 +146,14 @@ def get_account_info():
         # Get raw data from API
         raw_data = asyncio.run(GetAccountInformation(uid, "7", region, "/GetPlayerPersonalShow"))
         
-        # Transform the response to match your exact required structure
+        # Transform the response to match your exact format
         response = {
             "AccountInfo": {
                 "AccountBPBadges": raw_data["basicInfo"]["badgeCnt"],
                 "AccountBPID": raw_data["basicInfo"]["badgeId"],
-                "AccountCreateTime": int(raw_data["basicInfo"]["createAt"]),
+                "AccountCreateTime": raw_data["basicInfo"]["createAt"],
                 "AccountEXP": raw_data["basicInfo"]["exp"],
-                "AccountLastLogin": int(raw_data["basicInfo"]["lastLoginAt"]),
+                "AccountLastLogin": raw_data["basicInfo"]["lastLoginAt"],
                 "AccountLevel": raw_data["basicInfo"]["level"],
                 "AccountLikes": raw_data["basicInfo"]["liked"],
                 "AccountName": raw_data["basicInfo"]["nickname"],
@@ -199,7 +199,7 @@ def get_account_info():
             },
             "captainBasicInfo": {
                 "EquippedWeapon": raw_data["basicInfo"]["weaponSkinShows"],
-                "accountId": raw_data["basicInfo"]["accountId"],
+                "accountId": uid,
                 "accountType": raw_data["basicInfo"]["accountType"],
                 "badgeCnt": raw_data["basicInfo"]["badgeCnt"],
                 "badgeId": str(raw_data["basicInfo"]["badgeId"]),
