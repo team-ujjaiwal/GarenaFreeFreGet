@@ -145,8 +145,7 @@ def get_account_info():
     try:
         # Get raw data from API
         raw_data = asyncio.run(GetAccountInformation(uid, "7", region, "/GetPlayerPersonalShow"))
-        
-        # Transform the response to match your exact format
+
         response = {
             "AccountInfo": {
                 "AccountBPBadges": raw_data["basicInfo"]["badgeCnt"],
@@ -166,7 +165,7 @@ def get_account_info():
                 "CsRankPoint": raw_data["basicInfo"]["csRankingPoints"],
                 "EquippedWeapon": raw_data["basicInfo"]["weaponSkinShows"],
                 "EquippedWeaponImages": [
-                    f"https://ff-community-api.vercel.app/icons?id={weapon_id}" 
+                    f"https://ff-community-api.vercel.app/icons?id={weapon_id}"
                     for weapon_id in raw_data["basicInfo"]["weaponSkinShows"]
                 ],
                 "ReleaseVersion": raw_data["basicInfo"]["releaseVersion"],
@@ -240,7 +239,7 @@ def get_account_info():
                 "AccountSignature": raw_data["socialInfo"]["signature"]
             }
         }
-        
+
         return jsonify(response)
 
     except KeyError as e:
