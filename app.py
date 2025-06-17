@@ -146,14 +146,14 @@ def get_account_info():
         # Get raw data from API
         raw_data = asyncio.run(GetAccountInformation(uid, "7", region, "/GetPlayerPersonalShow"))
         
-        # Transform the response using ONLY values from the original response
+        # Transform the response to match your exact required structure
         response = {
             "AccountInfo": {
                 "AccountBPBadges": raw_data["basicInfo"]["badgeCnt"],
                 "AccountBPID": raw_data["basicInfo"]["badgeId"],
-                "AccountCreateTime": raw_data["basicInfo"]["createAt"],
+                "AccountCreateTime": int(raw_data["basicInfo"]["createAt"]),
                 "AccountEXP": raw_data["basicInfo"]["exp"],
-                "AccountLastLogin": raw_data["basicInfo"]["lastLoginAt"],
+                "AccountLastLogin": int(raw_data["basicInfo"]["lastLoginAt"]),
                 "AccountLevel": raw_data["basicInfo"]["level"],
                 "AccountLikes": raw_data["basicInfo"]["liked"],
                 "AccountName": raw_data["basicInfo"]["nickname"],
@@ -198,29 +198,29 @@ def get_account_info():
                 "GuildOwner": raw_data["clanBasicInfo"]["captainId"]
             },
             "captainBasicInfo": {
-                "EquippedWeapon": raw_data["captainBasicInfo"]["weaponSkinShows"],
-                "accountId": raw_data["captainBasicInfo"]["accountId"],
-                "accountType": raw_data["captainBasicInfo"]["accountType"],
-                "badgeCnt": raw_data["captainBasicInfo"]["badgeCnt"],
-                "badgeId": str(raw_data["captainBasicInfo"]["badgeId"]),
-                "createAt": str(raw_data["captainBasicInfo"]["createAt"]),
-                "csMaxRank": raw_data["captainBasicInfo"]["csMaxRank"],
-                "csRank": raw_data["captainBasicInfo"]["csRank"],
-                "csRankingPoints": raw_data["captainBasicInfo"]["csRankingPoints"],
-                "exp": raw_data["captainBasicInfo"]["exp"],
-                "lastLoginAt": str(raw_data["captainBasicInfo"]["lastLoginAt"]),
-                "level": raw_data["captainBasicInfo"]["level"],
-                "liked": raw_data["captainBasicInfo"]["liked"],
-                "maxRank": raw_data["captainBasicInfo"]["maxRank"],
-                "nickname": raw_data["captainBasicInfo"]["nickname"],
-                "rank": raw_data["captainBasicInfo"]["rank"],
-                "rankingPoints": raw_data["captainBasicInfo"]["rankingPoints"],
+                "EquippedWeapon": raw_data["basicInfo"]["weaponSkinShows"],
+                "accountId": raw_data["basicInfo"]["accountId"],
+                "accountType": raw_data["basicInfo"]["accountType"],
+                "badgeCnt": raw_data["basicInfo"]["badgeCnt"],
+                "badgeId": str(raw_data["basicInfo"]["badgeId"]),
+                "createAt": str(raw_data["basicInfo"]["createAt"]),
+                "csMaxRank": raw_data["basicInfo"]["csMaxRank"],
+                "csRank": raw_data["basicInfo"]["csRank"],
+                "csRankingPoints": raw_data["basicInfo"]["csRankingPoints"],
+                "exp": raw_data["basicInfo"]["exp"],
+                "lastLoginAt": str(raw_data["basicInfo"]["lastLoginAt"]),
+                "level": raw_data["basicInfo"]["level"],
+                "liked": raw_data["basicInfo"]["liked"],
+                "maxRank": raw_data["basicInfo"]["maxRank"],
+                "nickname": raw_data["basicInfo"]["nickname"],
+                "rank": raw_data["basicInfo"]["rank"],
+                "rankingPoints": raw_data["basicInfo"]["rankingPoints"],
                 "region": region.upper(),
-                "releaseVersion": raw_data["captainBasicInfo"]["releaseVersion"],
-                "seasonId": raw_data["captainBasicInfo"]["seasonId"],
-                "showBrRank": raw_data["captainBasicInfo"]["showBrRank"],
-                "showCsRank": raw_data["captainBasicInfo"]["showCsRank"],
-                "title": raw_data["captainBasicInfo"]["title"]
+                "releaseVersion": raw_data["basicInfo"]["releaseVersion"],
+                "seasonId": raw_data["basicInfo"]["seasonId"],
+                "showBrRank": raw_data["basicInfo"]["showBrRank"],
+                "showCsRank": raw_data["basicInfo"]["showCsRank"],
+                "title": raw_data["basicInfo"]["title"]
             },
             "creditScoreInfo": {
                 "creditScore": raw_data["creditScoreInfo"]["creditScore"],
