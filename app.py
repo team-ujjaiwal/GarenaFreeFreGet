@@ -145,7 +145,8 @@ def get_account_info():
     try:
         # Get raw data from API
         raw_data = asyncio.run(GetAccountInformation(uid, "7", region, "/GetPlayerPersonalShow"))
-
+        
+        # Transform to your desired format
         response = {
             "AccountInfo": {
                 "AccountBPBadges": raw_data["basicInfo"]["badgeCnt"],
@@ -156,7 +157,7 @@ def get_account_info():
                 "AccountLevel": raw_data["basicInfo"]["level"],
                 "AccountLikes": raw_data["basicInfo"]["liked"],
                 "AccountName": raw_data["basicInfo"]["nickname"],
-                "AccountRegion": region.upper(),
+                "AccountRegion": raw_data["basicInfo"]["region"],
                 "AccountSeasonId": raw_data["basicInfo"]["seasonId"],
                 "AccountType": raw_data["basicInfo"]["accountType"],
                 "BrMaxRank": raw_data["basicInfo"]["maxRank"],
@@ -165,8 +166,8 @@ def get_account_info():
                 "CsRankPoint": raw_data["basicInfo"]["csRankingPoints"],
                 "EquippedWeapon": raw_data["basicInfo"]["weaponSkinShows"],
                 "EquippedWeaponImages": [
-                    f"https://ff-community-api.vercel.app/icons?id={weapon_id}"
-                    for weapon_id in raw_data["basicInfo"]["weaponSkinShows"]
+                    f"https://ff-community-api.vercel.app/icons?id={w}" 
+                    for w in raw_data["basicInfo"]["weaponSkinShows"]
                 ],
                 "ReleaseVersion": raw_data["basicInfo"]["releaseVersion"],
                 "ShowBrRank": raw_data["basicInfo"]["showBrRank"],
@@ -177,8 +178,8 @@ def get_account_info():
             "AccountProfileInfo": {
                 "EquippedOutfit": raw_data["profileInfo"]["clothes"],
                 "EquippedOutfitImages": [
-                    f"https://ff-community-api.vercel.app/icons?id={outfit_id}"
-                    for outfit_id in raw_data["profileInfo"]["clothes"]
+                    f"https://ff-community-api.vercel.app/icons?id={c}"
+                    for c in raw_data["profileInfo"]["clothes"]
                 ],
                 "EquippedSkills": raw_data["profileInfo"]["equipedSkills"],
                 "EquippedSkillsImages": [
@@ -197,29 +198,29 @@ def get_account_info():
                 "GuildOwner": raw_data["clanBasicInfo"]["captainId"]
             },
             "captainBasicInfo": {
-                "EquippedWeapon": raw_data["basicInfo"]["weaponSkinShows"],
-                "accountId": uid,
-                "accountType": raw_data["basicInfo"]["accountType"],
-                "badgeCnt": raw_data["basicInfo"]["badgeCnt"],
-                "badgeId": str(raw_data["basicInfo"]["badgeId"]),
-                "createAt": str(raw_data["basicInfo"]["createAt"]),
-                "csMaxRank": raw_data["basicInfo"]["csMaxRank"],
-                "csRank": raw_data["basicInfo"]["csRank"],
-                "csRankingPoints": raw_data["basicInfo"]["csRankingPoints"],
-                "exp": raw_data["basicInfo"]["exp"],
-                "lastLoginAt": str(raw_data["basicInfo"]["lastLoginAt"]),
-                "level": raw_data["basicInfo"]["level"],
-                "liked": raw_data["basicInfo"]["liked"],
-                "maxRank": raw_data["basicInfo"]["maxRank"],
-                "nickname": raw_data["basicInfo"]["nickname"],
-                "rank": raw_data["basicInfo"]["rank"],
-                "rankingPoints": raw_data["basicInfo"]["rankingPoints"],
-                "region": region.upper(),
-                "releaseVersion": raw_data["basicInfo"]["releaseVersion"],
-                "seasonId": raw_data["basicInfo"]["seasonId"],
-                "showBrRank": raw_data["basicInfo"]["showBrRank"],
-                "showCsRank": raw_data["basicInfo"]["showCsRank"],
-                "title": raw_data["basicInfo"]["title"]
+                "EquippedWeapon": raw_data["captainBasicInfo"]["weaponSkinShows"],
+                "accountId": raw_data["captainBasicInfo"]["accountId"],
+                "accountType": raw_data["captainBasicInfo"]["accountType"],
+                "badgeCnt": raw_data["captainBasicInfo"]["badgeCnt"],
+                "badgeId": str(raw_data["captainBasicInfo"]["badgeId"]),
+                "createAt": str(raw_data["captainBasicInfo"]["createAt"]),
+                "csMaxRank": raw_data["captainBasicInfo"]["csMaxRank"],
+                "csRank": raw_data["captainBasicInfo"]["csRank"],
+                "csRankingPoints": raw_data["captainBasicInfo"]["csRankingPoints"],
+                "exp": raw_data["captainBasicInfo"]["exp"],
+                "lastLoginAt": str(raw_data["captainBasicInfo"]["lastLoginAt"]),
+                "level": raw_data["captainBasicInfo"]["level"],
+                "liked": raw_data["captainBasicInfo"]["liked"],
+                "maxRank": raw_data["captainBasicInfo"]["maxRank"],
+                "nickname": raw_data["captainBasicInfo"]["nickname"],
+                "rank": raw_data["captainBasicInfo"]["rank"],
+                "rankingPoints": raw_data["captainBasicInfo"]["rankingPoints"],
+                "region": raw_data["captainBasicInfo"]["region"],
+                "releaseVersion": raw_data["captainBasicInfo"]["releaseVersion"],
+                "seasonId": raw_data["captainBasicInfo"]["seasonId"],
+                "showBrRank": raw_data["captainBasicInfo"]["showBrRank"],
+                "showCsRank": raw_data["captainBasicInfo"]["showCsRank"],
+                "title": raw_data["captainBasicInfo"]["title"]
             },
             "creditScoreInfo": {
                 "creditScore": raw_data["creditScoreInfo"]["creditScore"],
@@ -240,16 +241,17 @@ def get_account_info():
             }
         }
 
-        return jsonify(response)
+        # Convert to JSON with consistent formatting
+        return jsonify(response), 200, {'Content-Type': 'application/json; charset=utf-8'}
 
     except KeyError as e:
         return jsonify({
-            "error": f"Required field missing in API response: {str(e)}",
-            "details": "The Free Fire API response is missing expected fields"
+            "error": f"Missing expected field in API response: {str(e)}",
+            "details": "The Free Fire API response structure has changed"
         }), 500
     except Exception as e:
         return jsonify({
-            "error": "Failed to fetch player information",
+            "error": "Failed to process player information",
             "details": str(e)
         }), 500
 
