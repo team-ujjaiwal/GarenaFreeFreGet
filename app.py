@@ -131,7 +131,7 @@ def cached_endpoint(ttl=300):
     return decorator
 
 # === Flask Routes ===
-@app.route('/player-info')
+@app.route('/data-fetch')
 @cached_endpoint()
 def get_account_info():
     region = request.args.get('region')
@@ -139,48 +139,53 @@ def get_account_info():
 
     if not uid:
         return jsonify({"error": "Please provide UID."}), 400
+
     if not region:
         return jsonify({"error": "Please provide REGION."}), 400
 
     try:
-        # Get raw data from API
         raw_data = asyncio.run(GetAccountInformation(uid, "7", region, "/GetPlayerPersonalShow"))
         
-        # Transform the response to match your exact format
-        response = {
-            "AccountInfo": {
-                "AccountBPBadges": raw_data["basicInfo"]["badgeCnt"],
-                "AccountBPID": raw_data["basicInfo"]["badgeId"],
-                "AccountCreateTime": raw_data["basicInfo"]["createAt"],
-                "AccountEXP": raw_data["basicInfo"]["exp"],
-                "AccountLastLogin": raw_data["basicInfo"]["lastLoginAt"],
-                "AccountLevel": raw_data["basicInfo"]["level"],
-                "AccountLikes": raw_data["basicInfo"]["liked"],
-                "AccountName": raw_data["basicInfo"]["nickname"],
-                "AccountRegion": region.upper(),
-                "AccountSeasonId": raw_data["basicInfo"]["seasonId"],
-                "AccountType": raw_data["basicInfo"]["accountType"],
-                "BrMaxRank": raw_data["basicInfo"]["maxRank"],
-                "BrRankPoint": raw_data["basicInfo"]["rankingPoints"],
-                "CsMaxRank": raw_data["basicInfo"]["csMaxRank"],
-                "CsRankPoint": raw_data["basicInfo"]["csRankingPoints"],
-                "EquippedWeapon": raw_data["basicInfo"]["weaponSkinShows"],
-                "EquippedWeaponImages": [
-                    f"https://ff-community-api.vercel.app/icons?id={weapon_id}" 
-                    for weapon_id in raw_data["basicInfo"]["weaponSkinShows"]
-                ],
-                "ReleaseVersion": raw_data["basicInfo"]["releaseVersion"],
-                "ShowBrRank": raw_data["basicInfo"]["showBrRank"],
-                "ShowCsRank": raw_data["basicInfo"]["showCsRank"],
-                "Title": raw_data["basicInfo"]["title"],
-                "hasElitePass": raw_data["basicInfo"]["hasElitePass"]
-            },
-            "AccountProfileInfo": {
-                "EquippedOutfit": raw_data["profileInfo"]["clothes"],
-                "EquippedOutfitImages": [
-                    f"https://ff-community-api.vercel.app/icons?id={outfit_id}"
-                    for outfit_id in raw_data["profileInfo"]["clothes"]
-                ],
+        transformed_data = {
+    "AccountInfo": {
+        "AccountAvatarId": raw_data["basicInfo"].get("headPic", 0),
+        "AccountBPBadges": raw_data["basicInfo"].get("badgeCnt", 0),
+        "AccountBPID": raw_data["basicInfo"].get("badgeId", 0),
+        "AccountBannerId": raw_data["basicInfo"].get("bannerId", 0),
+        "AccountCreateTime": raw_data["basicInfo"].get("createAt", 0),
+        "AccountEXP": raw_data["basicInfo"].get("exp", 0),
+        "AccountLastLogin": raw_data["basicInfo"].get("lastLoginAt", 0),
+        "AccountLevel": raw_data["basicInfo"].get("level", 0),
+        "AccountLikes": raw_data["basicInfo"].get("liked", 0),
+        "AccountName": raw_data["basicInfo"].get("nickname", ""),
+        "AccountRegion": raw_data["basicInfo"].get("region", ""),
+        "AccountSeasonId": raw_data["basicInfo"].get("seasonId", 0),
+        "AccountType": raw_data["basicInfo"].get("accountType", 0),
+        "AvatarImage": f"https://www.dl.cdn.freefireofficial.com/icons/{raw_data['basicInfo'].get('headPic', 0)}.png",
+        "BannerImage": f"https://www.dl.cdn.freefireofficial.com/icons/{raw_data['basicInfo'].get('bannerId', 0)}.png",
+        "BrMaxRank": raw_data["basicInfo"].get("maxRank", 0),
+        "BrRankPoint": raw_data["basicInfo"].get("rankingPoints", 0),
+        "CsMaxRank": raw_data["basicInfo"].get("csMaxRank", 0),
+        "CsRankPoint": raw_data["basicInfo"].get("csRankingPoints", 0),
+        "EquippedWeapon": raw_data["basicInfo"].get("weaponSkinShows", []),
+        "EquippedWeaponImages": [
+            f"https://www.dl.cdn.freefireofficial.com/icons/{weapon}.png" 
+            for weapon in raw_data["basicInfo"].get("weaponSkinShows", [])
+        ],
+        "ReleaseVersion": raw_data["basicInfo"].get("releaseVersion", ""),
+        "Role": raw_data["basicInfo"].get("role", 0),
+        "ShowBrRank": raw_data["basicInfo"].get("showBrRank", False),
+        "ShowCsRank": raw_data["basicInfo"].get("showCsRank", False),
+        "Title": raw_data["basicInfo"].get("title", 0),
+        "hasElitePass": raw_data["basicInfo"].get("hasElitePass", False) or 
+                       any(str(item).startswith('9') for item in raw_data["profileInfo"].get("equipedItems", []))
+    },
+    "AccountProfileInfo": {
+        "EquippedOutfit": raw_data["profileInfo"].get("clothes", []),
+        "EquippedOutfitImages": [
+            f"https://www.dl.cdn.freefireofficial.com/icons/{item}.png" 
+            for item in raw_data["profileInfo"].get("clothes", [])
+        ],
                 "EquippedSkills": raw_data["profileInfo"]["equipedSkills"],
                 "EquippedSkillsImages": [
                     "https://i.postimg.cc/BnpRPsjv/Kelly-The-Swift.png",
